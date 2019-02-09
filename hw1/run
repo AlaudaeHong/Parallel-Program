@@ -1,0 +1,27 @@
+#!/bin/bash
+
+./CLA.out < t0.txt > a
+diff -s a a0.txt
+
+./CLA.out < t1.txt > a
+diff -s a a1.txt
+
+./CLA.out < t2.txt > a
+diff -s a a2.txt
+
+./CLA.out < t3.txt > a
+diff -s a a3.txt
+
+./CLA.out < t4.txt > a
+diff -s a a4.txt
+
+./CLA.out < t5.txt > a
+diff -s a a5.txt
+
+./CLA.out < t6.txt > a
+diff -s a a6.txt
+
+./CLA.out < t7.txt > a
+diff -s a a7.txt
+
+
