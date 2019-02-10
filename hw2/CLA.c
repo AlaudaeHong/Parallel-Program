@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <unistd.h>
+#include <mpi.h>
 
 
 // EXAMPLE DATA STRUCTURE DESIGN AND LAYOUT FOR CLA
@@ -45,7 +47,20 @@ void cal_xgi_xpi(int* ygi, int* ypi, int ysize,	int *xgi, int* xpi, int xsize);
 void cal_xci(int* xci, int* xgi, int* xpi, int* yci, int ysize);
 void cal_sumi(void);
 
-int main(){
+int main(int argc, char** argv){
+
+	//Init MPI things
+	int my_mpi_size = -1;
+	int my_mpi_rank = -1;
+	MPI_Init(&argc, &argv);
+	MPI_Comm_size(MPI_COMM_WORLD, &my_mpi_size);
+	MPI_Comm_rank(MPI_COMM_WORLD, &my_mpi_rank);
+
+	//Check if have three arguments
+	if(argc != 3){
+		printf("Usage: %s [input.txt] [output.txt]", argv[0]);
+		return EXIT_FAILURE;
+	}
 
 	//Allocate dynamic memory
 	Init();
@@ -59,26 +74,43 @@ int main(){
 
 	//Calculate gi and pi
 	cal_gi_pi();
+	MPI_Barrier(MPI_COMM_WORLD);
 
 	//Calculate g and p for groups, sections, and supersections
 	cal_xgi_xpi(gi, pi, bits, ggj, gpj, ngroups);
+	MPI_Barrier(MPI_COMM_WORLD);
+	
 	cal_xgi_xpi(ggj, gpj, ngroups, sgk, spk, nsections);
+	MPI_Barrier(MPI_COMM_WORLD);
+	
 	cal_xgi_xpi(sgk, spk, nsections, ssgl, sspl, nsupersections);
+	MPI_Barrier(MPI_COMM_WORLD);
 
 	//Calculate ci for each supersection, section, group, and bit
 	cal_xci(sscl, ssgl, sspl, NULL, 1);
+	MPI_Barrier(MPI_COMM_WORLD);
+	
 	cal_xci(sck, sgk, spk, sscl, nsupersections);
+	MPI_Barrier(MPI_COMM_WORLD);
+	
 	cal_xci(gcj, ggj, gpj, sck, nsections);
+	MPI_Barrier(MPI_COMM_WORLD);
+	
 	cal_xci(ci,gi, pi, gcj, ngroups);
+	MPI_Barrier(MPI_COMM_WORLD);
 	
 	//Calculate the sum for each bit
 	cal_sumi();
+	MPI_Barrier(MPI_COMM_WORLD);
 
 	//convert the binary result into hex
 	revert(sumi);
 
 	//De-allocate dynamic memory
 	DeInit();
+
+	//MPI housekeeping
+	MPI_Finalize();
 
 	return EXIT_SUCCESS;
 }
