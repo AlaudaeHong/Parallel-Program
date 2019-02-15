@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
-
+#include <time.h>
 
 // EXAMPLE DATA STRUCTURE DESIGN AND LAYOUT FOR CLA
-#define input_size 262144
+#define input_size  262144
 #define block_size 32
 //Do not touch these defines 
-#define digits (input_size+1)
+#define digits (input_size)
 #define bits digits*4
 #define ngroups bits/block_size
 #define nsections ngroups/block_size
@@ -53,15 +53,18 @@ int main(){
 	//Reading input and filling hex1 and hex2
 	reading_text();
 
+	clock_t start = clock(), diff;
+
 	//Converting to binary
 	convert(hex1, bin1);
 	convert(hex2, bin2);
 
 	//Calculate gi and pi
 	cal_gi_pi();
+	//revert(gi);
 
 	//Calculate g and p for groups, sections, and supersections
-	cal_xgi_xpi(gi, pi, bits, ggj, gpj, ngroups);
+/*	cal_xgi_xpi(gi, pi, bits, ggj, gpj, ngroups);
 	cal_xgi_xpi(ggj, gpj, ngroups, sgk, spk, nsections);
 	cal_xgi_xpi(sgk, spk, nsections, ssgl, sspl, nsupersections);
 
@@ -70,12 +73,16 @@ int main(){
 	cal_xci(sck, sgk, spk, sscl, nsupersections);
 	cal_xci(gcj, ggj, gpj, sck, nsections);
 	cal_xci(ci,gi, pi, gcj, ngroups);
-	
+*/	
 	//Calculate the sum for each bit
 	cal_sumi();
 
+	diff = clock() - start;
+
+	double sec = (double)diff / CLOCKS_PER_SEC; sec++; sec--;
+	printf("%f ", sec);
 	//convert the binary result into hex
-	revert(sumi);
+//	revert(sumi);
 
 	//De-allocate dynamic memory
 	DeInit();
@@ -88,8 +95,8 @@ void Init(void){
 	bin1 = calloc(bits, sizeof(int));
 	bin2 = calloc(bits, sizeof(int));
 
-	hex1 = calloc(digits, sizeof(int));
-	hex2 = calloc(digits, sizeof(int));
+	hex1 = calloc(digits + 1, sizeof(int));
+	hex2 = calloc(digits + 1, sizeof(int));
 }
 
 //Free allocated memory
@@ -190,7 +197,7 @@ void revert(int* bin_array){
 	char* hex_result;
 
 	//Check every four bits as a group
-	for(int i = 0; i < digits - 1; i++){
+	for(int i = 0; i < digits; i++){
 
 		int value = 0;
 		
@@ -201,9 +208,8 @@ void revert(int* bin_array){
 
 		//Allocate dynamic memory
 		if(i == 0){
-			//hex_result = calloc(digits + 1, sizeof(char));
 			hex_result = calloc(digits, sizeof(char));
-			//hex_result[0] = '0';
+			hex_result[0] = '0';
 		}
 
 		//Give a corresponding hex value
@@ -285,6 +291,7 @@ void cal_xci(int* xci, int* xgi, int* xpi, int* yci, int ysize){
 
 	}
 
+	/*
 	//Because of the macro defination of digits, there is additional one groups need to calculate
 	if(ysize == ngroups){
 
@@ -301,18 +308,20 @@ void cal_xci(int* xci, int* xgi, int* xpi, int* yci, int ysize){
          }
 		
 	}
-	
+	*/
 }
 
 //Calculate the sum for each bit
 void cal_sumi(void){
 	for(int i = 0; i < bits; i++){
 		if(i == 0){
-			sumi[i] = bin1[i] ^ bin2[i];
+			sumi[i] = bin1[i] ^ bin2[i] ^ 0;
+			ci[i] = gi[i] | (pi[i] & 0);
 		}
 
 		else{
 			sumi[i] = bin1[i] ^ bin2[i] ^ ci[i-1];
+			ci[i] = gi[i] | (pi[i] & ci[i-1]);
 		}
 	}
 }

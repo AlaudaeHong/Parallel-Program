@@ -1,27 +1,47 @@
 #!/bin/bash
 
-./CLA.out < t0.txt > a
-diff -s a a0.txt
 
-./CLA.out < t1.txt > a
-diff -s a a1.txt
+#make all
 
-./CLA.out < t2.txt > a
-diff -s a a2.txt
+printf 'list as no barrier, barrier\n'
 
-./CLA.out < t3.txt > a
-diff -s a a3.txt
+printf '' > result.txt
 
-./CLA.out < t4.txt > a
-diff -s a a4.txt
+for i in {1..100}
+do
+	
+	
+#	mpirun -np 1 ./CLA t0.txt a		>> result.txt
+#	mpirun -np 1 ./CLAB t0.txt a	>> result.txt
 
-./CLA.out < t5.txt > a
-diff -s a a5.txt
+	./CLA1 < t0.txt >> result.txt
+	./CLA1 < t0.txt >> result.txt
 
-./CLA.out < t6.txt > a
-diff -s a a6.txt
+	mpirun -np 2 ./CLA t0.txt a		>> result.txt
+	mpirun -np 2 ./CLAB t0.txt a	>> result.txt
+	
+	mpirun -np 4 ./CLA t0.txt a		>> result.txt
+	mpirun -np 4 ./CLAB t0.txt a	>> result.txt
+	
+	mpirun -np 8 ./CLA t0.txt a		>> result.txt
+	mpirun -np 8 ./CLAB t0.txt a	>> result.txt
+	
+	mpirun -np 16 ./CLA t0.txt a	>> result.txt
+	mpirun -np 16 ./CLAB t0.txt a	>> result.txt
+	
+	mpirun -np 32 ./CLA t0.txt a	>> result.txt
+	mpirun -np 32 ./CLAB t0.txt a	>> result.txt
+	
+	printf "\n" >> result.txt 
 
-./CLA.out < t7.txt > a
-diff -s a a7.txt
+	if [ $i -gt 100 ]; then
+		printf "\033[3D%d" $i
+	elif [ $i -gt 10 ]; then
+		printf "\033[2D%d" $i
+	else
+		printf "\033[1D%d" $i
+	fi
 
+done
 
+printf "\n"

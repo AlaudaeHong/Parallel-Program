@@ -7,7 +7,7 @@
 #define input_size 1024
 #define block_size 8
 //Do not touch these defines 
-#define digits (input_size+1)
+#define digits (input_size)
 #define bits digits*4
 #define ngroups bits/block_size
 #define nsections ngroups/block_size
@@ -88,8 +88,8 @@ void Init(void){
 	bin1 = calloc(bits, sizeof(int));
 	bin2 = calloc(bits, sizeof(int));
 
-	hex1 = calloc(digits, sizeof(int));
-	hex2 = calloc(digits, sizeof(int));
+	hex1 = calloc(digits + 1, sizeof(int));
+	hex2 = calloc(digits + 1, sizeof(int));
 }
 
 //Free allocated memory
@@ -190,7 +190,7 @@ void revert(int* bin_array){
 	char* hex_result;
 
 	//Check every four bits as a group
-	for(int i = 0; i < digits - 1; i++){
+	for(int i = 0; i < digits; i++){
 
 		int value = 0;
 		
@@ -284,6 +284,7 @@ void cal_xci(int* xci, int* xgi, int* xpi, int* yci, int ysize){
 
 	}
 
+	/*
 	//Because of the macro defination of digits, there is additional one groups need to calculate
 	if(ysize == ngroups){
 
@@ -300,7 +301,7 @@ void cal_xci(int* xci, int* xgi, int* xpi, int* yci, int ysize){
          }
 		
 	}
-	
+	*/
 }
 
 //Calculate the sum for each bit
