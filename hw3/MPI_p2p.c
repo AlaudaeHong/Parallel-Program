@@ -1,6 +1,8 @@
 #include "MPI_p2p.h"
 
 //Current ONLY support MPI_LONG_LONG, MPI_SUM, and root rank of 0
+//Not support array addition
+//NOTICE: COUNT HERE IS DIFFERENT FROM WHAT IS IN MPI_REDUCE
 int MPI_P2P_Reduce(const void *sendbuf, void *recvbuf, int count, 
 		MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm){
 
@@ -34,14 +36,10 @@ int MPI_P2P_Reduce(const void *sendbuf, void *recvbuf, int count,
 
 	//Keep collecting until rank 0 has the final sum result
 	while(stride != mpi_size){
-
-//		printf("current stride: %d\n", stride);
 		
 		char if_target = 0;
 
 		if( (mpi_rank % (2 * stride)) ==  0 ){
-
-//			printf("TARGET: rank %d\n", mpi_rank);
 
 			int source_rank = mpi_rank + stride;
 
@@ -53,8 +51,6 @@ int MPI_P2P_Reduce(const void *sendbuf, void *recvbuf, int count,
 		MPI_Barrier(comm);
 
 		if( (mpi_rank % (2 * stride)) == stride ){
-
-//			printf("SOURCE: rank %d\n", mpi_rank);
 			
 			int target_rank = mpi_rank - stride;
 
@@ -69,7 +65,7 @@ int MPI_P2P_Reduce(const void *sendbuf, void *recvbuf, int count,
 		stride *= 2;
 	}
 
-	*( (long long*)recvbuf ) = sum_temp1;
+	if(recvbuf != NULL) *( (long long*)recvbuf ) = sum_temp1;
 	
 	return 1;
 	

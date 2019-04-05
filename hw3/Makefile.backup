@@ -1,0 +1,2 @@
+all:
+	mpixlc -O5 main_run.c MPI_p2p.c -o main.xl
