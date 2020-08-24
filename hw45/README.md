@@ -1,10 +1,5 @@
 <h1>Homework 4 & 5</h1>
 
-<h3>Unfinished Work</h3>
-<p>
-I have already finished the # of lives in the local universe. So, you need to finish the MPI_Reduce part. Note that the reduction need to be done before my reset function or the recorded data will be losted.
-</p>
-
 <h3>Compilation</h3>
 <p>Please compile a binary file named main.xl.
 </p>
